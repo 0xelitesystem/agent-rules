@@ -51,20 +51,20 @@ def render_terminal(result: ComplianceResult, color: bool | None = None) -> str:
     title = session.slug or Path(session.path).stem[:12]
     out("")
     out(_paint("  agent-rules", _BOLD, _CYAN, enabled=color)
-        + _paint(" — did the agent follow the rules?", _DIM, enabled=color))
+        + _paint(": did the agent follow the rules?", _DIM, enabled=color))
     out(_paint(f"  session {title} · {len(session.events)} events"
                + (f" · {session.cwd}" if session.cwd else ""),
                _DIM, enabled=color))
     out("")
 
     if not result.rules:
-        out("  no directive rules were found in the rules file(s) — nothing to check.")
+        out("  no directive rules were found in the rules file(s), so nothing to check.")
         out("")
         return "\n".join(lines)
 
     if result.score is None:
         out(_paint(f"  {len(result.rules)} rule(s) parsed, but none applied to this "
-                   "session — nothing to grade.", enabled=color))
+                   "session, so nothing to grade.", enabled=color))
         out("")
         # still show the rules so the user sees what was considered
         _render_findings(out, result, color)
@@ -90,7 +90,7 @@ def render_terminal(result: ComplianceResult, color: bool | None = None) -> str:
 
 def _render_findings(out, result: ComplianceResult, color: bool) -> None:
     out(_paint("  RULES", _BOLD, enabled=color))
-    # Order: violations first, then compliant, then n/a — most useful on top.
+    # Order: violations first, then compliant, then n/a. Most useful on top.
     order = {RuleVerdict.VIOLATED: 0, RuleVerdict.COMPLIANT: 1,
              RuleVerdict.NOT_APPLICABLE: 2}
     findings = sorted(result.findings, key=lambda f: order[f.verdict])
@@ -163,7 +163,7 @@ def render_markdown(result: ComplianceResult) -> str:
         rule = finding.rule.text.replace("|", "\\|")
         evidence = finding.evidence.replace("|", "\\|")
         conf = (finding.confidence.value
-                if finding.verdict is RuleVerdict.VIOLATED else "—")
+                if finding.verdict is RuleVerdict.VIOLATED else "n/a")
         kind = "prohibition" if finding.rule.kind is RuleKind.PROHIBITION else "mandate"
         lines.append(f"| {symbol} {label} | {kind} | {rule} | {conf} | {evidence} |")
     lines.append("")

@@ -1,7 +1,7 @@
 """Data models for agent-rules.
 
 The auditor reasons about three shapes. A Session is an ordered list of
-Events (assistant text or tool calls) — same shape as agent-receipts, so
+Events (assistant text or tool calls), the same shape as agent-receipts, so
 the two tools can share transcripts. A Rule is an imperative line mined
 from a rules file (CLAUDE.md / AGENTS.md / .cursorrules). A RuleFinding is
 the verdict on one rule: did the agent obey it, break it, or never trigger it.

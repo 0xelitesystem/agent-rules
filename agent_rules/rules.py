@@ -1,7 +1,7 @@
 """Mine imperative rules from a rules file (CLAUDE.md / AGENTS.md / .cursorrules).
 
 A rules file is mostly prose. We keep only the lines that are genuinely
-*directive* — the ones that tell the agent to never do something or to
+*directive*: the ones that tell the agent to never do something or to
 always do something. Each surviving line becomes a Rule, classified as a
 PROHIBITION ("never / don't / do not / avoid / no X") or a MANDATE
 ("always / must / ensure / only X"), with a salient subject extracted so
@@ -10,7 +10,7 @@ a matcher can later decide whether a transcript event touched it.
 This is a heuristic and we say so out loud: we read English imperative
 markers, not intent. A line with no directive marker is skipped, and the
 subject extraction is best-effort. The honest signal lives downstream, in
-the high-precision matchers — this file's job is only to find candidate
+the high-precision matchers. This file's job is only to find candidate
 rules and not drown the report in prose.
 """
 
@@ -149,7 +149,7 @@ _RULES_FILENAMES = ("CLAUDE.md", "AGENTS.md", ".cursorrules")
 def discover_rules_files(session_cwd: str = "") -> list[Path]:
     """Find rules files for a session: project cwd first, then ~/.claude.
 
-    Order matters — the project's CLAUDE.md is the most specific, the
+    Order matters: the project's CLAUDE.md is the most specific, the
     user's global ~/.claude/CLAUDE.md is the fallback. We also pick up
     AGENTS.md and .cursorrules in the project root.
     """

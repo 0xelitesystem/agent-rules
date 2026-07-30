@@ -3,10 +3,10 @@
 For every Rule we produce exactly one RuleFinding:
 
   VIOLATED       the agent did the forbidden thing, or skipped the mandated
-                 thing — with the offending event, command, and a quote.
+                 thing, with the offending event, command, and a quote.
   COMPLIANT      the rule was *relevant* this session (the agent did the
                  governed kind of work) and broke it nowhere.
-  NOT_APPLICABLE the rule never came up — the agent never touched its topic.
+  NOT_APPLICABLE the rule never came up: the agent never touched its topic.
 
 Confidence is HIGH when a built-in matcher (matchers.py) decided the
 verdict, and LOW when we fell back to generic keyword presence. The score
@@ -60,7 +60,7 @@ _ACTIVITY = {
 
 def _topic_active(session: Session, matcher_name: str) -> bool:
     # The parameterised write-allowed-dir matcher is "active" whenever the
-    # agent wrote or created any file at all — that's the governed action.
+    # agent wrote or created any file at all. That's the governed action.
     if matcher_name == "write-allowed-dir":
         return any(
             e.kind is EventKind.TOOL_CALL and (e.is_file_write() or e.tool_name == "Edit")
@@ -136,14 +136,14 @@ def _check_test_before_commit(session: Session, rule: Rule) -> RuleFinding:
 
 
 # Generic fallback: the rule's subject token appears in a command the agent
-# ran. This is deliberately weak — LOW confidence — and only fires for
+# ran. This is deliberately weak (LOW confidence) and only fires for
 # prohibitions (a mandate can't be checked by mere keyword presence).
 def _generic_subject_pattern(rule: Rule) -> re.Pattern | None:
     subject = rule.subject.strip()
     if not subject:
         return None
     # Distinctive tokens (flags, paths, words >=3 chars). We match if ANY of
-    # them appears in a command — "frobnicate production" should still flag
+    # them appears in a command, so "frobnicate production" should still flag
     # `frobnicate --prod`. Order longest-first so the report quote is sane.
     tokens = re.findall(r"--[\w-]+|[A-Za-z0-9_.\\/:-]{3,}", subject)
     tokens = sorted({t for t in tokens if not t.isdigit() and len(t) >= 3},

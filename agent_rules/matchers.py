@@ -2,7 +2,7 @@
 
 Rule extraction (rules.py) is fuzzy English parsing. *This* file is where
 the honesty lives. Each matcher is a small, hand-built detector for one
-well-known governance topic — "never automate Chrome", "always use the
+well-known governance topic: "never automate Chrome", "always use the
 pinned python", "never commit with --no-verify", and so on. A matcher
 knows two things:
 
@@ -54,7 +54,7 @@ _CHROME_LAUNCH = re.compile(
 
 # A bare `python` / `python3` invocation that is NOT the pinned interpreter.
 # We require a word boundary and reject anything that is a path to python
-# (contains a slash before it) — "C:\Python314\python.exe" is fine.
+# (contains a slash before it). "C:\Python314\python.exe" is fine.
 _BARE_PYTHON = re.compile(r"(?<![\\/\w.])python(?:3)?(?:\.exe)?\b", re.IGNORECASE)
 _PINNED_PYTHON = re.compile(r"[A-Za-z]:[\\/]python\d+[\\/]python", re.IGNORECASE)
 
@@ -240,7 +240,7 @@ BUILTIN_MATCHERS: list[Matcher] = [
 
 
 # Matchers that need the *allowed directory* parsed out of the rule text,
-# so they can't be a plain event predicate — built on demand.
+# so they can't be a plain event predicate. They are built on demand.
 _OUTPUT_DIR_RE = re.compile(
     r"(?:in|to|under|into|inside)\s+[`\"']?([\w.\-]+/[\w.\-/]*|[\w.\-]+/)",
     re.IGNORECASE,

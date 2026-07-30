@@ -1,14 +1,14 @@
 """Compliance Score: one number for how well the agent followed the rules.
 
 The base is the share of *applicable* rules the agent complied with
-(NOT_APPLICABLE rules are excluded — a rule that never came up neither helps
-nor hurts). On top of the base, violations subtract a weighted penalty, so a
+(NOT_APPLICABLE rules are excluded, since a rule that never came up neither
+helps nor hurts). On top of the base, violations subtract a weighted penalty, so a
 single hard breach can't be averaged away by a pile of obeyed rules:
 
   HIGH-confidence violation  -25   (a precise matcher caught a real breach)
   LOW-confidence violation    -8   (generic keyword match, less certain)
 
-A session where no rule applied has no score — there was nothing to grade.
+A session where no rule applied has no score: there was nothing to grade.
 """
 
 from __future__ import annotations

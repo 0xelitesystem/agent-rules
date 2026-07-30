@@ -1,8 +1,8 @@
 """Generate the demo rules file + a session that violates several of them.
 
 Writes:
-  examples/CLAUDE.md          — a realistic set of project rules
-  examples/demo-session.jsonl — a Claude Code transcript that breaks several
+  examples/CLAUDE.md          - a realistic set of project rules
+  examples/demo-session.jsonl - a Claude Code transcript that breaks several
 
 So that:
   agent-rules check examples/demo-session.jsonl --rules examples/CLAUDE.md
@@ -23,7 +23,7 @@ These rules are binding for any agent working in this repo.
 
 ## Environment
 - Always use `C:\\Python314\\python.exe` for Python; never run bare `python`.
-- Never automate Chrome or Brave — it closes the user's real browser window.
+- Never automate Chrome or Brave, it closes the user's real browser window.
 
 ## Git
 - Never commit with `--no-verify`; the pre-commit hooks must run.
@@ -118,7 +118,7 @@ def build_session() -> list[dict]:
         # VIOLATION: push to main
         _assistant_tool("t8", "Bash", {"command": "git push origin main"}),
         _tool_result("t8", "To github.com:acme/api.git\n   abc..9f2 main -> main"),
-        _assistant_text("Done — rate limiting is shipped and everything is working."),
+        _assistant_text("Done. Rate limiting is shipped and everything is working."),
     ]
 
 

@@ -125,7 +125,7 @@ def violating_transcript(tmp_path):
 
 @pytest.fixture
 def commit_without_tests_transcript(tmp_path):
-    """Edits code and commits, but never runs tests — violates the mandate."""
+    """Edits code and commits, but never runs tests, violating the mandate."""
     records = [
         assistant_tool("t1", "Edit", {
             "file_path": "C:\\fake\\project\\src\\app.py",
@@ -143,7 +143,7 @@ def commit_without_tests_transcript(tmp_path):
 
 @pytest.fixture
 def no_rules_apply_transcript(tmp_path):
-    """The agent only reads files and writes prose — touches no governed topic."""
+    """The agent only reads files and writes prose, touching no governed topic."""
     records = [
         assistant_text("Let me look around."),
         assistant_tool("t1", "Read", {

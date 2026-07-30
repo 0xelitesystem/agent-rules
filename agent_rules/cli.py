@@ -1,8 +1,8 @@
-"""agent-rules — did your coding agent actually follow its own rules?
+"""agent-rules: did your coding agent actually follow its own rules?
 
 Linters check that your CLAUDE.md is well-formed. This checks that your
 agent *obeyed* it. It mines imperative rules from CLAUDE.md / AGENTS.md /
-.cursorrules, then scans a session transcript for violations — the agent
+.cursorrules, then scans a session transcript for violations: the agent
 doing the forbidden thing, or skipping the mandated thing.
 
 Usage:
@@ -129,7 +129,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     # Windows consoles often default to cp1252, which can't encode the
-    # ✓ / ✗ / · / “ ” glyphs this report prints — writing them raises
+    # ✓ / ✗ / · / “ ” glyphs this report prints. Writing them raises
     # UnicodeEncodeError and crashes the run. Reconfigure both streams to
     # UTF-8 with errors="replace" so output degrades gracefully instead.
     for stream in (sys.stdout, sys.stderr):
