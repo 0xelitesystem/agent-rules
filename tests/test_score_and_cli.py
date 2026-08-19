@@ -52,7 +52,7 @@ def test_high_violation_penalised_more_than_low():
 def test_no_applicable_rules_has_no_score():
     r = _result([_finding(RuleVerdict.NOT_APPLICABLE)])
     assert r.score is None
-    assert r.grade == ", "
+    assert r.grade == "—"
 
 
 def test_violations_pull_grade_to_f():

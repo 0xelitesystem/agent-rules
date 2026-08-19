@@ -22,7 +22,7 @@ _CYAN = "\x1b[36m"
 _VERDICT_STYLE = {
     RuleVerdict.COMPLIANT: (_GREEN, "✓", "COMPLIANT"),
     RuleVerdict.VIOLATED: (_RED, "✗", "VIOLATED"),
-    RuleVerdict.NOT_APPLICABLE: (_DIM, " - ", "N/A"),
+    RuleVerdict.NOT_APPLICABLE: (_DIM, "·", "N/A"),
 }
 
 
@@ -52,8 +52,8 @@ def render_terminal(result: ComplianceResult, color: bool | None = None) -> str:
     out("")
     out(_paint("  agent-rules", _BOLD, _CYAN, enabled=color)
         + _paint(": did the agent follow the rules?", _DIM, enabled=color))
-    out(_paint(f"  session {title}  -  {len(session.events)} events"
-               + (f"  -  {session.cwd}" if session.cwd else ""),
+    out(_paint(f"  session {title} · {len(session.events)} events"
+               + (f" · {session.cwd}" if session.cwd else ""),
                _DIM, enabled=color))
     out("")
 
@@ -78,9 +78,9 @@ def render_terminal(result: ComplianceResult, color: bool | None = None) -> str:
     counts = result.counts()
     high = len(result.high_violations())
     out(_paint(
-        f"  {counts['compliant']} compliant  -  {counts['violated']} violated  -  "
+        f"  {counts['compliant']} compliant · {counts['violated']} violated · "
         f"{counts['not_applicable']} n/a"
-        + (f"  -  {high} high-confidence violation(s)" if high else ""),
+        + (f" · {high} high-confidence violation(s)" if high else ""),
         _DIM, enabled=color))
     out("")
 
@@ -103,14 +103,14 @@ def _render_findings(out, result: ComplianceResult, color: bool) -> None:
                     else " " + _paint("[low]", _DIM, enabled=color))
         tag = _paint(_kind_tag(finding.rule.kind), _DIM, enabled=color)
         out(f"  {_paint(symbol + ' ' + label.ljust(9), style, enabled=color)}"
-            f" {tag} "{_short(finding.rule.text, 92)}"{conf}")
+            f" {tag} “{_short(finding.rule.text, 92)}”{conf}")
         out(_paint(f"    └─ {finding.evidence}", _DIM, enabled=color))
     out("")
 
 
 def _short(text: str, limit: int) -> str:
     text = " ".join(text.split())
-    return text if len(text) <= limit else text[: limit - 1] + "..."
+    return text if len(text) <= limit else text[: limit - 1] + "…"
 
 
 def _finding_dict(finding: RuleFinding) -> dict:

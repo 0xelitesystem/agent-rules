@@ -25,7 +25,7 @@ def score_compliance(result: ComplianceResult) -> ComplianceResult:
     applicable = result.applicable()
     if not applicable:
         result.score = None
-        result.grade = ", "
+        result.grade = "—"
         return result
 
     complied = sum(1 for f in applicable if f.verdict is RuleVerdict.COMPLIANT)
