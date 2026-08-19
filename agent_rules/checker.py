@@ -33,7 +33,7 @@ from .models import (
 
 def _short(text: str, limit: int = 90) -> str:
     text = " ".join(text.split())
-    return text if len(text) <= limit else text[: limit - 1] + "…"
+    return text if len(text) <= limit else text[: limit - 1] + "..."
 
 
 # Topic-activity probes: was the agent doing the kind of work this matcher

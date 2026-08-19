@@ -129,7 +129,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     # Windows consoles often default to cp1252, which can't encode the
-    # ✓ / ✗ / · / “ ” glyphs this report prints. Writing them raises
+    # ✓ / ✗ /  -  / " " glyphs this report prints. Writing them raises
     # UnicodeEncodeError and crashes the run. Reconfigure both streams to
     # UTF-8 with errors="replace" so output degrades gracefully instead.
     for stream in (sys.stdout, sys.stderr):

@@ -16,10 +16,10 @@ There's a whole shelf of `CLAUDE.md` *linters* now, [cclint](https://github.com/
 
 ```
   agent-rules, did the agent follow the rules?
-  session demo-session · 10 events · C:\Users\dev\acme-api
+  session demo-session  -  10 events  -  C:\Users\dev\acme-api
 
   COMPLIANCE SCORE  0/100 (F)
-  1 compliant · 7 violated · 0 n/a · 7 high-confidence violation(s)
+  1 compliant  -  7 violated  -  0 n/a  -  7 high-confidence violation(s)
 
   RULES
   ✗ VIOLATED  PROHIBIT "Always use `C:\Python314\python.exe` for Python; never run bare `python`." [HIGH]
