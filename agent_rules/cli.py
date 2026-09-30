@@ -31,7 +31,7 @@ from .checker import check_rules
 from .models import ComplianceResult
 from .parser import discover_transcripts, parse_transcript, resolve_target
 from .report import render_json, render_markdown, render_terminal
-from .rules import discover_rules_files, parse_rules_file
+from .rules import discover_rules_files, is_remote_path, parse_rules_file
 from .score import score_compliance
 
 
@@ -67,6 +67,13 @@ def _cmd_check(args: argparse.Namespace) -> int:
     except FileNotFoundError as exc:
         print(f"agent-rules: {exc}", file=sys.stderr)
         return 2
+
+    cwd = result.session.cwd
+    if not args.rules and cwd and is_remote_path(cwd):
+        print("agent-rules: the session's working directory is not a plain "
+              "local path (a network share, for example), so rules files there "
+              "were not checked (pass --rules to choose a rules file).",
+              file=sys.stderr)
 
     if args.json:
         print(render_json(result))

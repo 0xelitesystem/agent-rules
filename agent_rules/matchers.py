@@ -44,11 +44,19 @@ def _commands(session: Session) -> list[Event]:
 
 # A "launch a browser" command: chrome/brave/chromium binaries, `start`,
 # `open`, Selenium/puppeteer/playwright pointed at chrome/brave, etc.
+#
+# The launcher branch is written so the regex engine stays linear on large
+# commands: the whitespace run after the launcher is consumed whole
+# ((?=\S) forbids splitting it), and the scan toward "chrome" stops at the
+# next launcher word, because the search tries that launcher on its own.
+# It matches exactly what `launcher\s+.*\b(?:chrome|brave)\b` matched.
+_LAUNCHER = r"\b(?:start|open|xdg-open)\s"
 _CHROME_LAUNCH = re.compile(
     r"\b(?:google[- ]?chrome|chrome\.exe|chromium|brave|brave\.exe|"
     r"brave-browser)\b"
     r"|--app=|chromedriver|"
-    r"\b(?:start|open|xdg-open)\s+.*\b(?:chrome|brave)\b",
+    r"\b(?:start|open|xdg-open)\s+(?=\S)"
+    r"(?:(?!" + _LAUNCHER + r")[^\n])*?\b(?:chrome|brave)\b",
     re.IGNORECASE,
 )
 
@@ -71,9 +79,14 @@ _PUSH_MAIN = re.compile(
 )
 # Reading a secrets file: cat/type/Get-Content/less on .env or *secret*,
 # plus the Read tool pointed at such a file (handled separately).
+#
+# Linear on large commands: the scan after a reader word stops at the next
+# reader word (the search tries that one on its own), and "secret" is matched
+# bare, since the old [\w.]* padding around it could not change the verdict.
+_READER = r"\b(?:cat|type|less|more|head|tail|bat|Get-Content|gc)\b"
 _READ_SECRET_CMD = re.compile(
-    r"\b(?:cat|type|less|more|head|tail|bat|Get-Content|gc)\b[^|;&]*"
-    r"(?:\.env\b|\.env\.[\w.]+|/secrets?/|\\secrets?\\|[\w.]*secret[\w.]*|"
+    _READER + r"(?:(?!" + _READER + r")[^|;&])*?"
+    r"(?:\.env\b|\.env\.[\w.]+|/secrets?/|\\secrets?\\|secret|"
     r"id_rsa|\.pem\b|credentials)",
     re.IGNORECASE,
 )
@@ -90,10 +103,17 @@ _INSTALL_DEPS = re.compile(
     re.IGNORECASE,
 )
 _SUDO = re.compile(r"(?:^|[|;&]\s*|\bthen\s+)sudo\b", re.IGNORECASE)
+# Recursive force delete. Written to stay linear on large commands, and to
+# match exactly what the plainer form matched:
+#   rm: one flag word that ends in r or f and contains both letters
+#       (was -[a-zA-Z]*r[a-zA-Z]*f | -[a-zA-Z]*f[a-zA-Z]*r, then \b);
+#   Remove-Item: -Recurse and -Force both later on the same line. Only the
+#       first Remove-Item on each line is scanned from, since any later one
+#       would find the same flags.
 _RM_RF = re.compile(
-    r"\brm\s+(?:-[a-zA-Z]*r[a-zA-Z]*f|-[a-zA-Z]*f[a-zA-Z]*r|-rf|-fr)\b"
-    r"|Remove-Item\b.*-Recurse\b.*-Force\b"
-    r"|Remove-Item\b.*-Force\b.*-Recurse\b",
+    r"\brm\s+-(?=[a-zA-Z]*[rf]\b)(?=[a-zA-Z]*r)(?=[a-zA-Z]*f)"
+    r"|(?:^|(?<=\n))(?:(?!Remove-Item\b)[^\n])*Remove-Item\b"
+    r"(?=[^\n]*-Recurse\b)[^\n]*-Force\b",
     re.IGNORECASE,
 )
 

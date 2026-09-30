@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -24,6 +25,30 @@ _VERDICT_STYLE = {
     RuleVerdict.VIOLATED: (_RED, "✗", "VIOLATED"),
     RuleVerdict.NOT_APPLICABLE: (_DIM, "·", "N/A"),
 }
+
+
+# Characters a terminal acts on instead of printing: C0 controls other than
+# tab and newline, DEL, C1 controls, and the bidi overrides/isolates. Rule
+# text and transcript commands are untrusted, so they are shown escaped.
+_UNSAFE_CHARS = re.compile(
+    r"[\x00-\x08\x0b-\x1f\x7f-\x9f"
+    r"\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]"
+)
+
+
+def _escape_char(match: re.Match) -> str:
+    code = ord(match.group())
+    return f"\\x{code:02x}" if code < 0x100 else f"\\u{code:04x}"
+
+
+def _clean(text: str) -> str:
+    """Make untrusted text inert: control and bidi characters become escapes."""
+    return _UNSAFE_CHARS.sub(_escape_char, text)
+
+
+def _md_cell(text: str) -> str:
+    """Untrusted text for one Markdown line or table cell."""
+    return _clean(text).replace("\n", " ")
 
 
 def _colors_enabled() -> bool:
@@ -48,12 +73,12 @@ def render_terminal(result: ComplianceResult, color: bool | None = None) -> str:
     lines: list[str] = []
     out = lines.append
 
-    title = session.slug or Path(session.path).stem[:12]
+    title = _clean(session.slug or Path(session.path).stem[:12])
     out("")
     out(_paint("  agent-rules", _BOLD, _CYAN, enabled=color)
         + _paint(": did the agent follow the rules?", _DIM, enabled=color))
     out(_paint(f"  session {title} · {len(session.events)} events"
-               + (f" · {session.cwd}" if session.cwd else ""),
+               + (f" · {_clean(session.cwd)}" if session.cwd else ""),
                _DIM, enabled=color))
     out("")
 
@@ -103,8 +128,8 @@ def _render_findings(out, result: ComplianceResult, color: bool) -> None:
                     else " " + _paint("[low]", _DIM, enabled=color))
         tag = _paint(_kind_tag(finding.rule.kind), _DIM, enabled=color)
         out(f"  {_paint(symbol + ' ' + label.ljust(9), style, enabled=color)}"
-            f" {tag} “{_short(finding.rule.text, 92)}”{conf}")
-        out(_paint(f"    └─ {finding.evidence}", _DIM, enabled=color))
+            f" {tag} “{_clean(_short(finding.rule.text, 92))}”{conf}")
+        out(_paint(f"    └─ {_clean(finding.evidence)}", _DIM, enabled=color))
     out("")
 
 
@@ -147,7 +172,7 @@ def render_markdown(result: ComplianceResult) -> str:
         "# agent-rules compliance report",
         "",
         f"- **Transcript:** `{Path(result.session.path).name}`",
-        f"- **Project:** `{result.session.cwd or 'unknown'}`",
+        f"- **Project:** `{_md_cell(result.session.cwd) or 'unknown'}`",
         f"- **Score:** {result.score if result.score is not None else 'n/a'}"
         f"/100 ({result.grade})",
         "",
@@ -160,8 +185,8 @@ def render_markdown(result: ComplianceResult) -> str:
              RuleVerdict.NOT_APPLICABLE: 2}
     for finding in sorted(result.findings, key=lambda f: order[f.verdict]):
         _, symbol, label = _VERDICT_STYLE[finding.verdict]
-        rule = finding.rule.text.replace("|", "\\|")
-        evidence = finding.evidence.replace("|", "\\|")
+        rule = _md_cell(finding.rule.text).replace("|", "\\|")
+        evidence = _md_cell(finding.evidence).replace("|", "\\|")
         conf = (finding.confidence.value
                 if finding.verdict is RuleVerdict.VIOLATED else "n/a")
         kind = "prohibition" if finding.rule.kind is RuleKind.PROHIBITION else "mandate"

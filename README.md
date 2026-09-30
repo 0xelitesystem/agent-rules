@@ -75,7 +75,9 @@ agent-rules check latest --md compliance.md
 agent-rules check latest --fail-on-violation
 ```
 
-If you don't pass `--rules`, agent-rules looks for `CLAUDE.md` in the session's working directory, then `~/.claude/CLAUDE.md`, then `AGENTS.md` / `.cursorrules`.
+If you don't pass `--rules`, agent-rules looks for `CLAUDE.md` in the session's working directory, then `~/.claude/CLAUDE.md`, then `AGENTS.md` / `.cursorrules`. On Windows, the working directory is opened only when it is a plain local drive path such as `C:\Users\dev\project`; anything else (a network share, a `\\?\`, `\??\` or `\\.\` path, a relative path) is never opened. On other systems, one starting with `\\`, `//`, `\??\` or `/??/` is never opened. Either way it is reported as not checked, so pass `--rules` for those sessions.
+
+Reports mask common credential shapes (tokens, keys, passwords, authorization headers), but masking is pattern based: review a report before you share it.
 
 ## How it works
 
